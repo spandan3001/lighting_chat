@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flash_chat/button_widget.dart';
 
 class WelcomeScreen extends StatefulWidget {
+  const WelcomeScreen({Key? key}) : super(key: key);
   static const id = 'welcome_screen';
 
   @override
@@ -13,7 +14,7 @@ class WelcomeScreen extends StatefulWidget {
 
 class _WelcomeScreenState extends State<WelcomeScreen>
     with SingleTickerProviderStateMixin {
-  AnimationController controller;
+  late AnimationController controller;
 
   @override
   void initState() {
@@ -82,4 +83,3 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     );
   }
 }
-

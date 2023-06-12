@@ -3,14 +3,14 @@ import 'constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class InputMessage extends StatelessWidget {
-  final controller;
-  final Function onPressed;
-  final Function onChanged;
-
-  final User loggedInUser = FirebaseAuth.instance.currentUser;
-
-  InputMessage({Key key, this.controller, this.onPressed, this.onChanged})
+  InputMessage({Key? key, this.controller, required this.onPressed, this.onChanged})
       : super(key: key);
+
+  final controller;
+  final VoidCallback onPressed;
+  final Function(String)? onChanged;
+
+  final User? loggedInUser = FirebaseAuth.instance.currentUser;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class InputMessage extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: controller,
-              onChanged: onChanged,
+              onChanged: onChanged!,
               decoration: kMessageTextFieldDecoration,
             ),
           ),

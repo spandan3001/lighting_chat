@@ -1,3 +1,5 @@
+import 'package:flash_chat/screens/home_screen.dart';
+import 'package:flash_chat/screens/screen_decider.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/screens/welcome_screen.dart';
 import 'package:flash_chat/screens/login_screen.dart';
@@ -15,13 +17,14 @@ class FlashChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: WelcomeScreen(),
-      initialRoute: WelcomeScreen.id,
+      initialRoute: HomeScreen.id,
       routes: {
+        ScreenDecider.id: (context) => const ScreenDecider(),
+        HomeScreen.id: (context) => const HomeScreen(),
         ChatScreen.id: (context) => ChatScreen(),
-        LoginScreen.id: (context) => LoginScreen(),
+        LoginScreen.id: (context) => const LoginScreen(),
         RegistrationScreen.id: (context) => RegistrationScreen(),
-        WelcomeScreen.id: (context) => WelcomeScreen(),
+        WelcomeScreen.id: (context) => const WelcomeScreen(),
       },
     );
   }
