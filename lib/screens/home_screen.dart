@@ -1,7 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/screen_decider/screen_decider.dart';
 import 'package:flutter/material.dart';
 
 import '../custom_cards/chat_card.dart';
 import '../custom_cards/custom_bottom_app_bar.dart';
+import '../global_data.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -11,37 +16,74 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50),
+        preferredSize: const Size.fromHeight(50),
         child: AppBar(
-          title: Text('LightChat'),
-          backgroundColor: Color(0xFF128C7E),
+          titleSpacing: 5,
+          title: const Text('LightChat'),
+          backgroundColor: kPrimaryColor,
           actions: [
             IconButton(
               onPressed: () {},
-              icon: Icon(Icons.camera_alt),
+              icon: const Icon(Icons.camera_alt),
             ),
             IconButton(
               onPressed: () {},
-              icon: Icon(Icons.search),
+              icon: const Icon(Icons.search),
             ),
             IconButton(
               onPressed: () {},
-              icon: Icon(Icons.more_vert),
+              icon: const Icon(Icons.more_vert),
             )
           ],
         ),
       ),
-      bottomNavigationBar: CustomBottomAppBar(),
-      body: Stack(
-        children: [
-          Expanded(
-            child: ListView.builder(
-                itemCount: 10,
-                itemBuilder: (context, index) {
-                  return ChatCard();
-                }),
-          ),
-        ],
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: kPrimaryColor,
+        onPressed: () {
+          FirebaseAuth.instance.signOut();
+          Navigator.pushNamedAndRemoveUntil(
+              context, ScreenDecider.id, (route) => false);
+        },
+        child: Image.asset(
+          'images/new_chat.png',
+          height: 30,
+          color: Colors.white,
+        ),
+      ),
+      bottomNavigationBar: const CustomBottomAppBar(),
+      body: SizedBox(
+        child: StreamBuilder(
+          stream: FirebaseFirestore.instance.collection('chats').snapshots(),
+          builder: (BuildContext context, snapshot) {
+            if (!snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.blueGrey,
+                ),
+              );
+            }
+            List<ChatCard> messagesList = [];
+            final users = snapshot.data?.docs;
+            var sender = "";
+            var receiver = "";
+            for (var user in users!) {
+              sender = user.data()['userName1'];
+              receiver = user.data()['userName2'];
+              if (sender == GlobalData.userName) {
+                sender = user.data()['userName2'];
+                receiver = user.data()['userName2'];
+              }
+              messagesList.add(
+                ChatCard(userName: sender),
+              );
+            }
+            return Expanded(
+              child: ListView(
+                children: messagesList,
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -1,9 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flash_chat/screens/chat_screen.dart';
-import 'package:flash_chat/screens/welcome_screen.dart';
+import 'package:flash_chat/screens/home_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'login_screen.dart';
+import '../screens/login_screen.dart';
 
 class ScreenDecider extends StatefulWidget {
   const ScreenDecider({Key? key}) : super(key: key);
@@ -20,7 +19,7 @@ class _ScreenDeciderState extends State<ScreenDecider> {
       body: StreamBuilder<User?>(
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.hasData) {
-            return ChatScreen();
+            return const HomeScreen();
           } else {
             return const LoginScreen();
           }

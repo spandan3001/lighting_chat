@@ -7,6 +7,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class RegistrationScreen extends StatefulWidget {
   static const id = 'registration_screen';
 
+  const RegistrationScreen({super.key});
+
   @override
   _RegistrationScreenState createState() => _RegistrationScreenState();
 }
@@ -21,7 +23,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -33,7 +35,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 child: Image.asset('images/logo.png'),
               ),
             ),
-            SizedBox(
+            const SizedBox(
               height: 48.0,
             ),
             TextField(
@@ -42,10 +44,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               onChanged: (value) {
                 email = value;
               },
-              decoration:
-                  kInputDecorationField.copyWith(hintText: 'Enter your Email'),
+              decoration: kTextInputDecoration(hintText: 'Enter your Email'),
             ),
-            SizedBox(
+            const SizedBox(
               height: 8.0,
             ),
             TextField(
@@ -54,10 +55,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               onChanged: (value) {
                 password = value;
               },
-              decoration: kInputDecorationField.copyWith(
-                  hintText: 'Enter your Password'),
+              decoration: kTextInputDecoration(hintText: 'Enter your Password'),
             ),
-            SizedBox(
+            const SizedBox(
               height: 24.0,
             ),
             ButtonWidget(
@@ -68,8 +68,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 try {
                   final newUser = await _auth.createUserWithEmailAndPassword(
                       email: email, password: password);
-                  if (newUser != null)
-                    Navigator.pushNamed(context, ChatScreen.id);
+
+                  Navigator.pushNamed(context, ChatScreen.id);
                 } catch (e) {
                   print(e);
                 }

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'global_data.dart';
 import 'message_bubble.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class MessageStream extends StatelessWidget {
-  final stream;
-  final User? loggedInUser = FirebaseAuth.instance.currentUser;
-  MessageStream({Key? key, this.stream}) : super(key: key);
+  final Stream<QuerySnapshot<Object?>>? stream;
+  const MessageStream({Key? key, this.stream}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +14,7 @@ class MessageStream extends StatelessWidget {
       stream: stream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               backgroundColor: Colors.blueGrey,
             ),
@@ -23,21 +23,26 @@ class MessageStream extends StatelessWidget {
         List<MessageBubble> messagesList = [];
         final messages = snapshot.data?.docs.reversed;
         for (var message in messages!) {
-          final textMessage = (message.data() as dynamic)['text'];
-          final textSender = (message.data() as dynamic)['sender'];
-          final currentUser = loggedInUser?.email;
+          var temp = (message.data() as dynamic);
+          final textMessage = temp['text'];
+          final textSender = temp['sender'];
+          var timeStamp = DateTime(2023);
+          if (temp['timeStamp'] != null) {
+            timeStamp = temp['timeStamp'].toDate();
+          }
+
           messagesList.add(
             MessageBubble(
-              text: textMessage,
+              text: textMessage.trim(),
               sender: textSender,
-              isMe: currentUser == textSender ? true : false,
+              time: DateFormat.jm().format(timeStamp),
+              isMe: GlobalData.userName == textSender ? true : false,
             ),
           );
         }
         return Expanded(
           child: ListView(
             reverse: true,
-            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
             children: messagesList,
           ),
         );

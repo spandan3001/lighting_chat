@@ -1,3 +1,4 @@
+import 'package:flash_chat/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
 
@@ -9,16 +10,16 @@ class CustomBottomAppBar extends StatelessWidget
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 10),
+      child: const Padding(
+        padding: EdgeInsets.symmetric(vertical: 15.0, horizontal: 10),
         child: GNav(
           tabBackgroundColor: Colors.black12,
           color: Colors.grey,
           gap: 10,
           backgroundColor: Colors.white,
           padding: EdgeInsets.all(10),
-          activeColor: Color(0xFF25D366),
-          tabs: const [
+          activeColor: kSecondaryColor,
+          tabs: [
             GButton(
               icon: Icons.message,
               text: 'messages',

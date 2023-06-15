@@ -1,47 +1,53 @@
+import 'package:flash_chat/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat_bubble/chat_bubble.dart';
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({this.text, this.sender, this.isMe = false});
+  const MessageBubble(
+      {super.key,
+      this.text,
+      this.sender,
+      this.isMe = false,
+      required this.time});
 
   final String? text;
   final String? sender;
+  final String? time;
   final bool isMe;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10.0),
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(
-            sender!,
-            style: TextStyle(
-              fontSize: 10.0,
-              color: Colors.black54,
-            ),
-          ),
-          Material(
-            elevation: 5.0,
-            borderRadius: BorderRadius.only(
-              topRight: isMe ? Radius.circular(0.0) : Radius.circular(30.0),
-              topLeft: isMe ? Radius.circular(30.0) : Radius.circular(0.0),
-              bottomLeft: Radius.circular(30.0),
-              bottomRight: Radius.circular(30.0),
-            ),
-            color: isMe ? Colors.blueAccent : Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+    return ChatBubble(
+      backGroundColor: isMe ? kCardColor : Colors.white,
+      margin: isMe
+          ? const EdgeInsets.only(top: 10, bottom: 10, left: 20)
+          : const EdgeInsets.only(top: 10, bottom: 10, right: 20),
+      //padding: const EdgeInsets.symmetric(horizontal: 5),
+      clipper: isMe
+          ? ChatBubbleClipper1(type: BubbleType.sendBubble)
+          : ChatBubbleClipper1(type: BubbleType.receiverBubble),
+      alignment: isMe ? Alignment.topRight : Alignment.topLeft,
+      child: Container(
+        constraints: BoxConstraints(
+          maxWidth: MediaQuery.of(context).size.width * 0.7,
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Expanded(
               child: Text(
                 text!,
-                style: TextStyle(
-                  color: isMe ? Colors.white : Colors.black,
-                ),
+                style: const TextStyle(color: Colors.black, fontSize: 15),
               ),
             ),
-          ),
-        ],
+            const SizedBox(width: 5),
+            Text(
+              time!,
+              style: const TextStyle(color: Colors.black),
+            )
+          ],
+        ),
       ),
     );
   }
