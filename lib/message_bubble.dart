@@ -29,6 +29,7 @@ class MessageBubble extends StatelessWidget {
       alignment: isMe ? Alignment.topRight : Alignment.topLeft,
       child: Container(
         constraints: BoxConstraints(
+          minHeight: 20,
           maxWidth: MediaQuery.of(context).size.width * 0.7,
         ),
         child: Row(
