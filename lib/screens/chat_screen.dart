@@ -7,19 +7,19 @@ import 'package:flutter/material.dart';
 import 'package:flash_chat/input_box.dart';
 import 'package:flash_chat/message_stream.dart';
 import '../model/message_model.dart';
-import '../utils/loading.dart';
 
 class ChatScreen extends StatefulWidget {
   static const id = 'chat_screen';
-  const ChatScreen(
-      {super.key,
-      required this.userModel,
-      required this.withUser,
-      required this.chats});
+  const ChatScreen({
+    super.key,
+    required this.userModel,
+    required this.withUser,
+    required this.withUserDocId,
+  });
 
   final UserModel userModel;
   final String withUser;
-  final List<MessageModel> chats;
+  final String withUserDocId;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -67,28 +67,39 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            Expanded(
-              flex: 10,
-              child: MessageStream(
-                chats: widget.chats,
-              ),
+            MessageStream(
+              withUser: widget.withUser,
             ),
-            Expanded(
-              child: InputMessage(
-                controller: messageController,
-                onPressed: () {
-                  if (messageController.text.trim().isNotEmpty) {
-                    CloudService.messageCollection(chatModel.id).add(
-                      {
-                        'text': messageController.text.trim(),
-                        'sender': widget.userModel.email,
-                        'timeStamp': FieldValue.serverTimestamp()
-                      },
-                    );
-                  }
-                  messageController.clear();
-                },
-              ),
+            InputMessage(
+              controller: messageController,
+              onPressed: () {
+                if (messageController.text.trim().isNotEmpty) {
+                  FieldValue fieldValue = FieldValue.serverTimestamp();
+                  CloudService.userCollection
+                      .doc(widget.userModel.id)
+                      .collection('messages')
+                      .add(
+                    {
+                      'text': messageController.text.trim(),
+                      'withUser': widget.withUser,
+                      'timeStamp': fieldValue,
+                      'withUserDocId': widget.withUserDocId,
+                    },
+                  );
+                  CloudService.userCollection
+                      .doc(widget.withUserDocId)
+                      .collection('messages')
+                      .add(
+                    {
+                      'text': messageController.text.trim(),
+                      'withUser': widget.userModel.email,
+                      'timeStamp': fieldValue,
+                      'withUserDocId': widget.userModel.id,
+                    },
+                  );
+                }
+                messageController.clear();
+              },
             )
           ],
         ),

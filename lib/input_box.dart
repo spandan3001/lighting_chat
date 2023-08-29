@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class InputMessage extends StatefulWidget {
-  InputMessage(
+  const InputMessage(
       {Key? key, this.controller, required this.onPressed, this.onChanged})
       : super(key: key);
 
@@ -16,86 +15,88 @@ class InputMessage extends StatefulWidget {
 }
 
 class _InputMessageState extends State<InputMessage> {
-  final User? loggedInUser = FirebaseAuth.instance.currentUser;
-  bool toggle = false;
-
   @override
   Widget build(BuildContext context) {
+    const baseWidth = 360;
+    double w = MediaQuery.sizeOf(context).width;
+    double fem = w / baseWidth;
+    double fFem = fem * 0.97;
+    const sendButtonWidth = 50.0;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 2),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          Expanded(
-            child: Card(
-              elevation: 1,
-              shape: RoundedRectangleBorder(
+          Container(
+            width: w - (fem * (sendButtonWidth + 10)),
+            height: 50 * fem,
+            decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(30),
-              ),
-              child: Row(
-                children: [
-                  InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {},
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.emoji_emotions_outlined,
-                      ),
+                color: Colors.white,
+                boxShadow: kElevationToShadow[1]),
+            child: Row(
+              children: [
+                InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {},
+                  child: SizedBox(
+                    width: fem * 40,
+                    height: fem * 40,
+                    child: const Icon(
+                      Icons.emoji_emotions_outlined,
                     ),
                   ),
-                  Expanded(
-                    child: TextField(
-                      controller: widget.controller,
-                      style: const TextStyle(fontSize: 18),
-                      onChanged: widget.onChanged,
-                      maxLines: null,
-                      decoration: kMessageTextFieldDecoration,
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: widget.controller,
+                    style: TextStyle(fontSize: fFem * 18),
+                    onChanged: widget.onChanged,
+                    maxLines: null,
+                    decoration: kMessageTextFieldDecoration,
+                  ),
+                ),
+                InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {},
+                  child: SizedBox(
+                    width: fem * 40,
+                    height: fem * 40,
+                    child: const Icon(
+                      Icons.attach_file_sharp,
                     ),
                   ),
-                  InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {},
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.attach_file_sharp,
-                      ),
+                ),
+                // InkWell(
+                //   customBorder: const CircleBorder(),
+                //   onTap: () {},
+                //   child: SizedBox(
+                //     width: fem * 40,
+                //     height: fem * 40,
+                //     child: const Icon(
+                //       Icons.currency_rupee,
+                //     ),
+                //   ),
+                // ),
+                InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {},
+                  child: SizedBox(
+                    width: fem * 40,
+                    height: fem * 40,
+                    child: const Icon(
+                      Icons.camera_alt,
                     ),
                   ),
-                  InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {},
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.currency_rupee,
-                      ),
-                    ),
-                  ),
-                  InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {},
-                    child: const SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.camera_alt,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 5)
-                ],
-              ),
+                ),
+                const SizedBox(width: 5)
+              ],
             ),
           ),
-          const SizedBox(width: 5),
           SizedBox(
-            width: 50,
-            height: 50,
+            width: fem * sendButtonWidth,
+            height: fem * 50,
             child: InkWell(
               customBorder: const CircleBorder(),
               onTap: widget.onPressed,
@@ -104,7 +105,7 @@ class _InputMessageState extends State<InputMessage> {
                 elevation: 1,
                 shape: CircleBorder(),
                 child: Padding(
-                  padding: EdgeInsets.only(left: 5.0),
+                  padding: EdgeInsets.only(left: 3),
                   child: Icon(
                     Icons.send,
                     color: Colors.white,

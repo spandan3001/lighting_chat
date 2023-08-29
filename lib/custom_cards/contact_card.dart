@@ -1,50 +1,39 @@
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
-
-import '../model/message_model.dart';
 import '../model/user_model.dart';
 
-class ChatCard extends StatelessWidget {
-  const ChatCard(
-      {super.key,
-      required this.userModel,
-      required this.withUser,
-      required this.lastChat});
+class ContactCard extends StatelessWidget {
+  const ContactCard({
+    super.key,
+    required this.userModel,
+    required this.withUserModel,
+  });
 
-  final String withUser;
   final UserModel userModel;
-  final MessageModel lastChat;
+  final UserModel withUserModel;
 
   @override
   Widget build(BuildContext context) {
-    // Color cardColor = Colors.transparent;
-    //
-    // Color splashColor = Colors.grey.shade400;
-    String lastMsg = lastChat.text;
     return InkWell(
-      // onTap: () {
-      //   onTapCardSelection();
-      //   Navigator.pushNamed(context, ChatScreen.id);
-      // },
-      onLongPress: () {},
-      //containedInkWell: true,
-      //highlightShape: BoxShape.rectangle,
-      //splashFactory: InkRipple.splashFactory,
-      //splashColor: splashColor,
       onTap: () {
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ChatScreen(
               userModel: userModel,
-              withUser: withUser,
-              withUserDocId: lastChat.withUserDocId,
+              withUser: withUserModel.email,
+              withUserDocId: withUserModel.id,
             ),
           ),
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.all(5.0),
+        decoration: BoxDecoration(
+          boxShadow: kElevationToShadow[1],
+          borderRadius: BorderRadius.circular(2),
+          color: Colors.white,
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -64,25 +53,17 @@ class ChatCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      withUser,
+                      withUserModel.name,
                       style: const TextStyle(fontSize: 15),
                     ),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.done_all,
-                          size: 20,
-                          color: Colors.lightBlueAccent,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(lastMsg),
-                      ],
+                    Text(
+                      withUserModel.email,
+                      style: const TextStyle(fontSize: 10),
                     ),
                   ],
                 ),
               ],
             ),
-            const Text("yesterday"),
           ],
         ),
       ),

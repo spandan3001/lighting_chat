@@ -19,7 +19,7 @@ class RegistrationScreen extends StatefulWidget {
 
 class RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
-  late String email, password;
+  late String email, password, name;
 
   bool showPassword = true;
 
@@ -45,24 +45,32 @@ class RegistrationScreenState extends State<RegistrationScreen> {
             ),
             TextField(
               keyboardType: TextInputType.emailAddress,
-              textAlign: TextAlign.center,
               onChanged: (value) {
                 email = value;
               },
               decoration: kTextInputDecoration(
-                  hintText: 'Enter your Email', lableText: "Email"),
+                  hintText: 'Enter your email', lableText: "Email"),
             ),
             const SizedBox(
               height: 8.0,
             ),
             TextField(
-              textAlign: TextAlign.center,
+              onChanged: (value) {
+                name = value;
+              },
+              decoration: kTextInputDecoration(
+                  hintText: 'Enter your name', lableText: "Name"),
+            ),
+            const SizedBox(
+              height: 8.0,
+            ),
+            TextField(
               obscureText: true,
               onChanged: (value) {
                 password = value;
               },
               decoration: kTextInputDecoration(
-                hintText: 'Enter your Password',
+                hintText: 'Enter your password',
                 lableText: "Password",
                 suffixIcon: IconButton(
                   icon: Icon(
@@ -95,7 +103,7 @@ class RegistrationScreenState extends State<RegistrationScreen> {
                       email: email, password: password);
                   CloudService.userCollection.add(
                     UserModel.toMap(
-                      UserModel(id: "", number: "", name: "", email: email),
+                      UserModel(id: "", name: name, email: email),
                     ),
                   );
 

@@ -4,12 +4,14 @@ class MessageModel {
   final String id;
   final String withUser;
   final String text;
+  final String withUserDocId;
   final Timestamp timeStamp;
   final String? imageUrl;
 
   const MessageModel({
     this.imageUrl,
     required this.withUser,
+    required this.withUserDocId,
     required this.text,
     required this.id,
     required this.timeStamp,
@@ -24,6 +26,7 @@ class MessageModel {
       timeStamp: data['timeStamp'] ?? Timestamp.now(),
       imageUrl: data['imageUrl'],
       text: data['text'],
+      withUserDocId: data['withUserDocId'],
     );
   }
 }
