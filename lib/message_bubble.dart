@@ -1,18 +1,13 @@
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/model/message_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
+import 'package:intl/intl.dart';
 
 class MessageBubble extends StatelessWidget {
-  const MessageBubble(
-      {super.key,
-      this.text,
-      this.sender,
-      this.isMe = false,
-      required this.time});
+  const MessageBubble({super.key, this.isMe = false, required this.msgModel});
 
-  final String? text;
-  final String? sender;
-  final String? time;
+  final MessageModel msgModel;
   final bool isMe;
 
   @override
@@ -38,13 +33,13 @@ class MessageBubble extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                text!,
+                msgModel.text,
                 style: const TextStyle(color: Colors.black, fontSize: 15),
               ),
             ),
             const SizedBox(width: 5),
             Text(
-              time!,
+              DateFormat.jm().format(msgModel.timeStamp.toDate()),
               style: const TextStyle(color: Colors.black),
             )
           ],

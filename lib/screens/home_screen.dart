@@ -1,16 +1,29 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:flash_chat/screen_decider/screen_decider.dart';
+import 'package:flash_chat/screens/all_chats_screen.dart';
+import 'package:flash_chat/screens/contact_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../custom_cards/chat_card.dart';
-import '../custom_cards/custom_bottom_app_bar.dart';
-import '../global_data.dart';
+import '../custom_cards/custom_tab_bar.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
   static const id = 'home_screen';
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TabController(length: 4, vsync: this);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +44,9 @@ class HomeScreen extends StatelessWidget {
               icon: const Icon(Icons.search),
             ),
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                FirebaseAuth.instance.signOut();
+              },
               icon: const Icon(Icons.more_vert),
             )
           ],
@@ -40,9 +55,7 @@ class HomeScreen extends StatelessWidget {
       floatingActionButton: FloatingActionButton(
         backgroundColor: kPrimaryColor,
         onPressed: () {
-          FirebaseAuth.instance.signOut();
-          Navigator.pushNamedAndRemoveUntil(
-              context, ScreenDecider.id, (route) => false);
+          Navigator.pushNamed(context, ContactScreen.id);
         },
         child: Image.asset(
           'images/new_chat.png',
@@ -50,40 +63,34 @@ class HomeScreen extends StatelessWidget {
           color: Colors.white,
         ),
       ),
-      bottomNavigationBar: const CustomBottomAppBar(),
-      body: SizedBox(
-        child: StreamBuilder(
-          stream: FirebaseFirestore.instance.collection('chats').snapshots(),
-          builder: (BuildContext context, snapshot) {
-            if (!snapshot.hasData) {
-              return const Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.blueGrey,
-                ),
-              );
-            }
-            List<ChatCard> messagesList = [];
-            final users = snapshot.data?.docs;
-            var sender = "";
-            var receiver = "";
-            for (var user in users!) {
-              sender = user.data()['userName1'];
-              receiver = user.data()['userName2'];
-              if (sender == GlobalData.userName) {
-                sender = user.data()['userName2'];
-                receiver = user.data()['userName2'];
-              }
-              messagesList.add(
-                ChatCard(userName: sender),
-              );
-            }
-            return Expanded(
-              child: ListView(
-                children: messagesList,
-              ),
-            );
-          },
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: CustomTabBar(
+          tabController: _controller,
+          tabs: const [
+            Tab(
+              icon: Icon(Icons.message),
+            ),
+            Tab(
+              icon: Icon(Icons.call),
+            ),
+            Tab(
+              icon: Icon(Icons.people),
+            ),
+            Tab(
+              icon: Icon(Icons.circle_outlined),
+            ),
+          ],
         ),
+      ),
+      body: TabBarView(
+        controller: _controller,
+        children: [
+          const AllChatScreen(),
+          Container(),
+          Container(),
+          Container(),
+        ],
       ),
     );
   }

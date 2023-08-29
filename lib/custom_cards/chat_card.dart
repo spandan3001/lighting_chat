@@ -1,70 +1,26 @@
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 
-import '../global_data.dart';
+import '../model/message_model.dart';
+import '../model/user_model.dart';
 
-class ChatCard extends StatefulWidget {
-  const ChatCard({super.key, required this.userName});
+class ChatCard extends StatelessWidget {
+  const ChatCard(
+      {super.key,
+      required this.userModel,
+      required this.withUser,
+      required this.chats});
 
-  final String userName;
+  final String withUser;
+  final UserModel userModel;
+  final List<MessageModel> chats;
 
-  @override
-  State<ChatCard> createState() => _ChatCardState();
-}
-
-class _ChatCardState extends State<ChatCard> {
-  void norOfCards(bool isCardSelected) {
-    this.isCardSelected = isCardSelected;
-    if (GlobalData.countOfCardSelected > 0 && isCardSelected) {
-      GlobalData.countOfCardSelected++;
-    } else {
-      GlobalData.countOfCardSelected--;
-    }
-  }
-
-  void cardUnSelect() {
-    norOfCards(false);
-    cardColor = Colors.transparent;
-    splashColor = Colors.grey.shade400;
-  }
-
-  void cardSelect() {
-    norOfCards(true);
-    cardColor = Colors.grey.shade300;
-    splashColor = Colors.transparent;
-  }
-
-  void isCardLongPressed() {
-    if (GlobalData.countOfCardSelected > 0) {
-      GlobalData.cardLongPressed = true;
-    } else {
-      GlobalData.cardLongPressed = false;
-    }
-  }
-
-  void onTapCardSelection() {
-    setState(() {
-      if (GlobalData.cardLongPressed && !isCardSelected) {
-        cardSelect();
-      } else {
-        cardUnSelect();
-      }
-      isCardLongPressed();
-    });
-  }
-
-  void onLongPressCardSelection() {
-    setState(() {
-      cardSelect();
-      isCardLongPressed();
-    });
-  }
-
-  Color cardColor = Colors.transparent;
-  Color splashColor = Colors.grey.shade400;
-  bool isCardSelected = false;
   @override
   Widget build(BuildContext context) {
+    Color cardColor = Colors.transparent;
+
+    Color splashColor = Colors.grey.shade400;
+    String lastMsg = chats.last.text;
     return TextButton(
       style: TextButton.styleFrom(
         backgroundColor: Colors.white,
@@ -74,16 +30,22 @@ class _ChatCardState extends State<ChatCard> {
       //   onTapCardSelection();
       //   Navigator.pushNamed(context, ChatScreen.id);
       // },
-      onLongPress: () {
-        //onLongPressCardSelection();
-      },
+      onLongPress: () {},
       //containedInkWell: true,
       //highlightShape: BoxShape.rectangle,
       //splashFactory: InkRipple.splashFactory,
       //splashColor: splashColor,
       onPressed: () {
-        GlobalData.currentSender = widget.userName;
-        Navigator.pushNamed(context, ChatScreen.id);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(
+              userModel: userModel,
+              withUser: withUser,
+              chats: chats,
+            ),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.all(10),
@@ -106,18 +68,18 @@ class _ChatCardState extends State<ChatCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.userName,
+                      withUser,
                       style: const TextStyle(fontSize: 15),
                     ),
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.done_all,
                           size: 20,
                           color: Colors.lightBlueAccent,
                         ),
-                        SizedBox(width: 5),
-                        Text('hello'),
+                        const SizedBox(width: 5),
+                        Text(lastMsg),
                       ],
                     ),
                   ],

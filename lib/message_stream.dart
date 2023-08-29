@@ -1,52 +1,32 @@
+import 'package:flash_chat/model/message_model.dart';
+import 'package:flash_chat/user_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'global_data.dart';
+import 'package:provider/provider.dart';
 import 'message_bubble.dart';
+import 'model/user_model.dart';
 
 class MessageStream extends StatelessWidget {
-  final Stream<QuerySnapshot<Object?>>? stream;
-  const MessageStream({Key? key, this.stream}) : super(key: key);
+  const MessageStream({
+    Key? key,
+    required this.chats,
+  }) : super(key: key);
+
+  final List<MessageModel> chats;
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<QuerySnapshot>(
-      stream: stream,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.blueGrey,
-            ),
-          );
-        }
-        List<MessageBubble> messagesList = [];
-        final messages = snapshot.data?.docs.reversed;
-        for (var message in messages!) {
-          var temp = (message.data() as dynamic);
-          final textMessage = temp['text'];
-          final textSender = temp['sender'];
-          var timeStamp = DateTime(2023);
-          if (temp['timeStamp'] != null) {
-            timeStamp = temp['timeStamp'].toDate();
-          }
-
-          messagesList.add(
-            MessageBubble(
-              text: textMessage.trim(),
-              sender: textSender,
-              time: DateFormat.jm().format(timeStamp),
-              isMe: GlobalData.userName == textSender ? true : false,
-            ),
-          );
-        }
-        return Expanded(
-          child: ListView(
-            reverse: true,
-            children: messagesList,
-          ),
-        );
-      },
+    UserModel userModel = Provider.of<UserProvider>(context).getUser();
+    List<MessageBubble> messagesList = List.generate(
+      chats.length,
+      (index) => MessageBubble(
+        msgModel: chats[index],
+        isMe: userModel.email == chats[index].withUser ? true : false,
+      ),
+    );
+    return ListView.builder(
+      reverse: true,
+      itemCount: messagesList.length,
+      itemBuilder: (context, index) => messagesList[index],
     );
   }
 }

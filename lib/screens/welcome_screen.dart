@@ -3,28 +3,20 @@ import 'package:flash_chat/screens/login_screen.dart';
 import 'package:flash_chat/screens/registration_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/button_widget.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({Key? key}) : super(key: key);
   static const id = 'welcome_screen';
 
   @override
-  _WelcomeScreenState createState() => _WelcomeScreenState();
+  WelcomeScreenState createState() => WelcomeScreenState();
 }
 
-class _WelcomeScreenState extends State<WelcomeScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController controller;
-
+class WelcomeScreenState extends State<WelcomeScreen> {
   @override
   void initState() {
     super.initState();
-    controller =
-        AnimationController(duration: Duration(seconds: 1), vsync: this);
-    controller.forward();
-    controller.addListener(() {
-      setState(() {});
-    });
   }
 
   @override
@@ -32,7 +24,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Scaffold(
       backgroundColor: Colors.white,
       body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -41,26 +33,25 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               children: <Widget>[
                 Hero(
                   tag: 'logo',
-                  child: Container(
-                    child: Image.asset('images/logo.png'),
+                  child: SizedBox(
                     height: 60,
+                    child: Image.asset('images/logo.png'),
                   ),
                 ),
                 AnimatedTextKit(
                   animatedTexts: [
                     TypewriterAnimatedText(
-                      'Flash Chat',
-                      textStyle: TextStyle(
+                      'LIGHT CHAT',
+                      textStyle: GoogleFonts.playfairDisplay().copyWith(
                         color: Colors.blueGrey,
-                        fontSize: 45.0,
-                        fontWeight: FontWeight.w900,
+                        fontSize: 45,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            SizedBox(
+            const SizedBox(
               height: 48.0,
             ),
             ButtonWidget(
@@ -68,13 +59,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                 Navigator.pushNamed(context, LoginScreen.id);
               },
               text: 'Log In',
-              color: Colors.lightBlueAccent,
+            ),
+            const SizedBox(
+              height: 48.0,
             ),
             ButtonWidget(
               onPressed: () {
                 Navigator.pushNamed(context, RegistrationScreen.id);
               },
-              color: Colors.blueAccent,
               text: 'Register',
             ),
           ],

@@ -1,8 +1,12 @@
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/firebase_services/firestore_services.dart';
 import 'package:flash_chat/screens/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/button_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../model/user_model.dart';
+import '../utils/loading.dart';
 
 class RegistrationScreen extends StatefulWidget {
   static const id = 'registration_screen';
@@ -10,13 +14,14 @@ class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
 
   @override
-  _RegistrationScreenState createState() => _RegistrationScreenState();
+  RegistrationScreenState createState() => RegistrationScreenState();
 }
 
-class _RegistrationScreenState extends State<RegistrationScreen> {
-  bool showSpinner = false;
+class RegistrationScreenState extends State<RegistrationScreen> {
   final _auth = FirebaseAuth.instance;
   late String email, password;
+
+  bool showPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +49,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               onChanged: (value) {
                 email = value;
               },
-              decoration: kTextInputDecoration(hintText: 'Enter your Email'),
+              decoration: kTextInputDecoration(
+                  hintText: 'Enter your Email', lableText: "Email"),
             ),
             const SizedBox(
               height: 8.0,
@@ -55,29 +61,52 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
               onChanged: (value) {
                 password = value;
               },
-              decoration: kTextInputDecoration(hintText: 'Enter your Password'),
+              decoration: kTextInputDecoration(
+                hintText: 'Enter your Password',
+                lableText: "Password",
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    // Based on password visible state choose the icon
+                    showPassword ? Icons.visibility : Icons.visibility_off,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    showPassword = !showPassword;
+                    setState(() {});
+                  },
+                ),
+              ),
             ),
             const SizedBox(
               height: 24.0,
             ),
             ButtonWidget(
               onPressed: () async {
-                setState(() {
-                  showSpinner = true;
-                });
                 try {
-                  final newUser = await _auth.createUserWithEmailAndPassword(
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const Loading();
+                      },
+                    );
+                  }
+                  await _auth.createUserWithEmailAndPassword(
                       email: email, password: password);
+                  CloudService.userCollection.add(
+                    UserModel.toMap(
+                      UserModel(id: "", number: "", name: "", email: email),
+                    ),
+                  );
 
-                  Navigator.pushNamed(context, ChatScreen.id);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  }
                 } catch (e) {
                   print(e);
                 }
-                setState(() {
-                  showSpinner = false;
-                });
               },
-              color: Colors.blueAccent,
               text: 'Register',
             )
           ],

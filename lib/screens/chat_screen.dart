@@ -1,16 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/firebase_services/firestore_services.dart';
+import 'package:flash_chat/model/chat_model.dart';
+import 'package:flash_chat/model/user_model.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/input_box.dart';
 import 'package:flash_chat/message_stream.dart';
-
-import '../global_data.dart';
+import '../model/message_model.dart';
+import '../utils/loading.dart';
 
 class ChatScreen extends StatefulWidget {
   static const id = 'chat_screen';
+  const ChatScreen(
+      {super.key,
+      required this.userModel,
+      required this.withUser,
+      required this.chats});
 
-  const ChatScreen({super.key});
+  final UserModel userModel;
+  final String withUser;
+  final List<MessageModel> chats;
   @override
   State<ChatScreen> createState() => _ChatScreenState();
 }
@@ -18,38 +27,11 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   final messageController = TextEditingController();
   late String textMessage;
-  final _firebaseFirestore = FirebaseFirestore.instance;
-  final _auth = FirebaseAuth.instance;
+  late ChatModel chatModel;
 
   @override
   void initState() {
     super.initState();
-  }
-
-  getCurrentUser(User loggedInUser) async {
-    final user = _auth.currentUser;
-    if (user != null) {
-      loggedInUser = user;
-    }
-  }
-
-  Future<Stream<QuerySnapshot<Object?>>?> getMessages() async {
-    Stream<QuerySnapshot<Object?>>? stream;
-    final collection = _firebaseFirestore
-        .collection('chats')
-        .where('userName1', isEqualTo: 'pavan')
-        .where('userName2', isEqualTo: 'spandan')
-        .get();
-    await collection.then((value) async {
-      for (var element in value.docs) {
-        GlobalData.currentChat = _firebaseFirestore
-            .collection('chats')
-            .doc(element.id)
-            .collection('message');
-        stream = GlobalData.currentChat.orderBy('timeStamp').snapshots();
-      }
-    });
-    return stream;
   }
 
   @override
@@ -77,7 +59,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ),
         titleSpacing: 0,
-        title: Text(GlobalData.currentSender),
+        title: Text(widget.withUser),
         backgroundColor: kPrimaryColor,
       ),
       body: SafeArea(
@@ -85,32 +67,28 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            FutureBuilder(
-              future: getMessages(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  return MessageStream(
-                    stream: snapshot.data,
-                  );
-                } else {
-                  return const Center(child: CircularProgressIndicator());
-                }
-              },
+            Expanded(
+              flex: 10,
+              child: MessageStream(
+                chats: widget.chats,
+              ),
             ),
-            InputMessage(
-              controller: messageController,
-              onPressed: () {
-                if (messageController.text.trim().isNotEmpty) {
-                  GlobalData.currentChat.add(
-                    {
-                      'text': messageController.text.trim(),
-                      'sender': GlobalData.userName,
-                      'timeStamp': FieldValue.serverTimestamp()
-                    },
-                  );
-                }
-                messageController.clear();
-              },
+            Expanded(
+              child: InputMessage(
+                controller: messageController,
+                onPressed: () {
+                  if (messageController.text.trim().isNotEmpty) {
+                    CloudService.messageCollection(chatModel.id).add(
+                      {
+                        'text': messageController.text.trim(),
+                        'sender': widget.userModel.email,
+                        'timeStamp': FieldValue.serverTimestamp()
+                      },
+                    );
+                  }
+                  messageController.clear();
+                },
+              ),
             )
           ],
         ),

@@ -1,10 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flash_chat/constants.dart';
+import 'package:flash_chat/firebase_services/firestore_services.dart';
 import 'package:flash_chat/global_data.dart';
 import 'package:flash_chat/screen_decider/screen_decider.dart';
+import 'package:flash_chat/user_provider.dart';
+import 'package:flash_chat/utils/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/button_widget.dart';
+import 'package:provider/provider.dart';
+
+import '../model/user_model.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -15,17 +21,16 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool showSpinner = false;
   late String email, password;
   final _auth = FirebaseAuth.instance;
-  late TextEditingController _emailController, _passwordController;
+  late TextEditingController _userIdController, _passwordController;
   bool showPassword = false;
   String errorMessage = "";
 
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
+    _userIdController = TextEditingController();
     _passwordController = TextEditingController();
   }
 
@@ -48,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             const SizedBox(height: 48.0),
             TextField(
-              controller: _emailController,
+              controller: _userIdController,
               keyboardType: TextInputType.emailAddress,
               decoration: kTextInputDecoration(
                   hintText: 'Enter your Email', lableText: 'email'),
@@ -67,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 hintText: 'Enter your password',
                 suffixIcon: IconButton(
                   icon: Icon(
-                    // Based on passwordVisible state choose the icon
+                    // Based on password visible state choose the icon
                     showPassword ? Icons.visibility : Icons.visibility_off,
                     color: Colors.grey,
                   ),
@@ -97,32 +102,36 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
             ButtonWidget(
-              color: Colors.lightBlueAccent,
               text: 'Log In',
               onPressed: () async {
                 try {
-                  NavigatorState state = Navigator.of(context);
-                  await _auth.signInWithEmailAndPassword(
-                      email: _emailController.text,
-                      password: _passwordController.text);
-                  DocumentSnapshot<Map<String, dynamic>>? snap;
-                  await FirebaseFirestore.instance
-                      .collection('users')
-                      .where('email', isEqualTo: _emailController.text)
-                      .get()
-                      .then((value) async {
-                    for (var element in value.docs) {
-                      print(element.id);
-                      snap = await FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(element.id)
-                          .get();
+                  if (context.mounted) {
+                    final snapshot = await CloudService.userCollection
+                        .where('email', isEqualTo: _userIdController.text)
+                        .get();
+                    print(snapshot.docs.length);
+                    UserModel userModel =
+                        UserModel.fromSnapshot(snapshot.docs.first);
+                    if (context.mounted) {
+                      Provider.of<UserProvider>(context, listen: false)
+                          .setUser(userModel);
                     }
-                  });
-                  GlobalData.userName = snap?.data()!['userName'];
-                  print(GlobalData.userName);
-                  state.pushNamedAndRemoveUntil(
-                      ScreenDecider.id, (route) => false);
+                  }
+                  if (context.mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return const Loading();
+                      },
+                    );
+                  }
+                  await _auth.signInWithEmailAndPassword(
+                      email: _userIdController.text,
+                      password: _passwordController.text);
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  }
                 } on FirebaseAuthException catch (e) {
                   if (e.code == "unknown") {
                     errorMessage = "Nothing is Entered";
